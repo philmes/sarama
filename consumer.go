@@ -1007,8 +1007,9 @@ func (bc *brokerConsumer) handleResponses() {
 		child.preferredReadReplica = invalidPreferredReplicaID
 
 		if errors.Is(result, errTimedOut) {
-			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because consuming was taking too long\n",
+			Logger.Printf("consumer/broker/%d abandoned subscription to %s/%d because consuming was taking too long - triggering child\n",
 				bc.broker.ID(), child.topic, child.partition)
+			child.trigger <- none{}
 			delete(bc.subscriptions, child)
 		} else if errors.Is(result, ErrOffsetOutOfRange) {
 			// there's no point in retrying this it will just fail the same way again
